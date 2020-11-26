@@ -1,4 +1,7 @@
+import 'package:estados_app/models/usuario.dart';
+import 'package:estados_app/services/usuario_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -7,11 +10,24 @@ class Pagina1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final usuarioService = Provider.of<UsuarioService>(context);
+
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(icon: Icon(Icons.delete_forever),
+            onPressed: (){
+              usuarioService.removerUsuario();
+            },
+          ),
+        ],
         title: Text('Pagina 1'),
       ),
-      body: InformacionUsuario(),
+      //Utilizamos el provider
+      body: usuarioService.existeUsuario
+      ? InformacionUsuario( usuarioService.usuario )
+      : Center(child: Text('No hay usuario seleccionado'),),
       floatingActionButton:  FloatingActionButton(
         child: Icon(Icons.adb),
         onPressed: (){
@@ -25,9 +41,13 @@ class Pagina1 extends StatelessWidget {
 
 class InformacionUsuario extends StatelessWidget {
 
+    final Usuario usuario;
+
+  const InformacionUsuario(this.usuario); 
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       height: double.infinity,
       width: double.infinity,
@@ -37,13 +57,13 @@ class InformacionUsuario extends StatelessWidget {
         children: <Widget>[
           Text('General', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
           Divider(),
-          ListTile(title: Text('Nombre : '),),
-          ListTile(title: Text('Edad : '),),
+          ListTile(title: Text('Nombre : ${usuario.nombre}'),),
+          ListTile(title: Text('Edad : ${usuario.edad}'),),
           Text('Profeciones', style:  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
           Divider(),
-          ListTile(title: Text('Profeción 1 : '),),
-          ListTile(title: Text('Profeción 2 : '),),
-          ListTile(title: Text('Profeción 3 : '),),
+          ...usuario.profeciones.map(
+            (profecion) => ListTile(title: Text(profecion),)
+          ).toList()
 
         ],
       ),
